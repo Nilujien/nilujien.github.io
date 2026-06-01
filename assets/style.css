@@ -674,9 +674,9 @@ section { padding: 88px 0; }
 .projects .project:nth-child(2) { transition-delay: .08s; }
 .passions .passion:nth-child(3),
 .projects .project:nth-child(3) { transition-delay: .16s; }
-.projects .project:nth-child(4) { transition-delay: .12s; }
-.projects .project:nth-child(5) { transition-delay: .2s; }
-.projects .project:nth-child(6) { transition-delay: .28s; }
+.projects .project:nth-child(4) { transition-delay: .24s; }
+.projects .project:nth-child(5) { transition-delay: .32s; }
+.projects .project:nth-child(6) { transition-delay: .4s; }
 
 @media (prefers-reduced-motion: reduce) {
   .reveal { opacity: 1; transform: none; transition: none; }
