@@ -403,7 +403,7 @@
         var rect = btn.getBoundingClientRect();
         var mx = e.clientX - rect.left - rect.width / 2;
         var my = e.clientY - rect.top - rect.height / 2;
-        btn.style.transform = "translate(" + (mx * 0.2).toFixed(1) + "px," + (my * 0.3 - 2).toFixed(1) + "px)";
+        btn.style.transform = "translate3d(" + (mx * 0.2).toFixed(1) + "px," + (my * 0.3 - 2).toFixed(1) + "px,0)";
       });
       btn.addEventListener("pointerleave", function () {
         btn.style.transform = "";

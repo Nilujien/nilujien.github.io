@@ -737,8 +737,9 @@ section { padding: 88px 0; }
   position: relative;
   transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateZ(0);
   transform-style: preserve-3d;
-  will-change: transform;
 }
+
+.tilt.is-tilting { will-change: transform; }
 
 .tilt::before {
   content: "";
