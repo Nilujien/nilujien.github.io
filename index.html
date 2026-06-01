@@ -20,7 +20,9 @@
       <a class="brand" href="#top">Julie<span>.</span></a>
       <nav class="nav-links" id="menu">
         <a href="#passions">Approche</a>
+        <a href="#processus">Process</a>
         <a href="#projets">Projets</a>
+        <a href="#interaction">Interaction</a>
         <a href="#apropos">À propos</a>
         <a class="nav-cta" href="https://github.com/Nilujien" target="_blank" rel="noopener">GitHub</a>
       </nav>
@@ -43,6 +45,28 @@
         <div class="hero-actions">
           <a class="btn btn-primary" href="#projets">Découvrir les projets</a>
           <a class="btn btn-ghost" href="https://github.com/Nilujien" target="_blank" rel="noopener">Mon GitHub</a>
+        </div>
+        <div class="principles reveal">
+          <article>
+            <span>01</span>
+            <h3>Sobriété</h3>
+            <p>Une hiérarchie nette et des choix visuels assumés.</p>
+          </article>
+          <article>
+            <span>02</span>
+            <h3>Fluidité</h3>
+            <p>Des transitions brèves, lisibles et toujours utiles.</p>
+          </article>
+          <article>
+            <span>03</span>
+            <h3>Détail</h3>
+            <p>Micro-interactions discrètes pour enrichir l'expérience.</p>
+          </article>
+        </div>
+        <div class="hero-lab reveal" aria-hidden="true">
+          <p>Interaction en direct</p>
+          <div class="hero-orb orb-main"></div>
+          <div class="hero-orb orb-soft"></div>
         </div>
       </div>
     </section>
@@ -83,6 +107,42 @@
       </div>
     </section>
 
+    <section id="processus" class="process">
+      <div class="wrap">
+        <div class="section-head reveal">
+          <span class="label">Méthode UI/UX</span>
+          <h2>Du problème au prototype itéré</h2>
+          <p>Un parcours interactif qui montre comment chaque interface progresse avec des retours réels.</p>
+        </div>
+        <div class="process-grid reveal">
+          <div class="process-steps" role="tablist" aria-label="Étapes de conception UI UX">
+            <button class="process-step active" role="tab" aria-selected="true" data-step="0">Problème</button>
+            <button class="process-step" role="tab" aria-selected="false" data-step="1">Exploration</button>
+            <button class="process-step" role="tab" aria-selected="false" data-step="2">Prototype</button>
+            <button class="process-step" role="tab" aria-selected="false" data-step="3">Itération</button>
+          </div>
+          <article class="process-panel" id="process-panel">
+            <h3>Problème</h3>
+            <p>Identifier précisément ce qui ralentit l'usage ou crée de la confusion.</p>
+            <div class="proof-grid">
+              <div>
+                <span>Avant</span>
+                <p>Navigation dense, priorités visuelles mélangées.</p>
+              </div>
+              <div>
+                <span>Après</span>
+                <p>Structure clarifiée avec chemin principal immédiat.</p>
+              </div>
+            </div>
+            <ul>
+              <li>Décision UI : renforcer le contraste des actions clés.</li>
+              <li>Feedback : lecture plus rapide sur mobile.</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
     <section id="projets">
       <div class="wrap">
         <div class="section-head reveal">
@@ -90,98 +150,194 @@
           <h2>Projets en cours et publiés</h2>
           <p>Un aperçu de ce que je construis et fais évoluer, ouvert et disponible sur GitHub.</p>
         </div>
+        <div class="project-filters reveal" role="toolbar" aria-label="Filtrer les projets">
+          <button class="filter-btn active" data-filter="all">Tous</button>
+          <button class="filter-btn" data-filter="uiux">UI/UX</button>
+          <button class="filter-btn" data-filter="game">Jeu</button>
+          <button class="filter-btn" data-filter="simulation">Simulation</button>
+          <button class="filter-btn" data-filter="tools">Outils</button>
+        </div>
         <div class="projects">
-          <a class="project reveal" href="https://github.com/Nilujien/haize" target="_blank" rel="noopener">
+          <article class="project reveal" data-domains="simulation,game">
             <div class="project-top">
               <h3>HAIZE</h3>
-              <svg class="arrow" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg>
+              <a class="project-link" href="https://github.com/Nilujien/haize" target="_blank" rel="noopener" aria-label="Voir le projet HAIZE sur GitHub">
+                <svg class="arrow" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg>
+              </a>
             </div>
             <p>
               Une simulation de vie artificielle où des entités vivent, se lient et se brouillent.
               Tout se joue dans le navigateur, en observant ce qui émerge des interactions.
             </p>
+            <div class="project-meta">
+              <div><span>Contexte</span><strong>Systèmes émergents</strong></div>
+              <div><span>Rôle</span><strong>Conception + dev</strong></div>
+              <div><span>Résultat</span><strong>Boucles vivantes</strong></div>
+            </div>
+            <details>
+              <summary>Aperçu détaillé</summary>
+              <p>Travail sur le rythme des feedbacks visuels et l'observabilité pour rendre le comportement des agents lisible.</p>
+            </details>
             <div class="tags">
               <span class="tag">Simulation</span>
               <span class="tag">JavaScript</span>
               <span class="tag">Canvas</span>
             </div>
-          </a>
+          </article>
 
-          <a class="project reveal" href="https://github.com/Nilujien/BIM_View" target="_blank" rel="noopener">
+          <article class="project reveal" data-domains="uiux,tools">
             <div class="project-top">
               <h3>BIM View</h3>
-              <svg class="arrow" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg>
+              <a class="project-link" href="https://github.com/Nilujien/BIM_View" target="_blank" rel="noopener" aria-label="Voir le projet BIM View sur GitHub">
+                <svg class="arrow" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg>
+              </a>
             </div>
             <p>
               Un visualiseur de maquettes 3D qui ouvre des fichiers IFC directement dans le navigateur.
               L'accent est mis sur une navigation fluide et une interface lisible, sans installation.
             </p>
+            <div class="project-meta">
+              <div><span>Contexte</span><strong>Usage pro 3D</strong></div>
+              <div><span>Rôle</span><strong>UX de navigation</strong></div>
+              <div><span>Résultat</span><strong>Parcours simplifié</strong></div>
+            </div>
+            <details>
+              <summary>Aperçu détaillé</summary>
+              <p>Focus sur l'orientation spatiale, le repérage rapide des commandes et la lisibilité des informations critiques.</p>
+            </details>
             <div class="tags">
               <span class="tag">UI/UX</span>
               <span class="tag">Three.js</span>
               <span class="tag">WebGL</span>
             </div>
-          </a>
+          </article>
 
-          <a class="project reveal" href="https://github.com/Nilujien/Jine" target="_blank" rel="noopener">
+          <article class="project reveal" data-domains="game">
             <div class="project-top">
               <h3>Jine</h3>
-              <svg class="arrow" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg>
+              <a class="project-link" href="https://github.com/Nilujien/Jine" target="_blank" rel="noopener" aria-label="Voir le projet Jine sur GitHub">
+                <svg class="arrow" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg>
+              </a>
             </div>
             <p>
               Un projet de jeu au stade de prototype. J'y explore une idée de mécanique et la façon
               de la rendre agréable à prendre en main, pas à pas.
             </p>
+            <div class="project-meta">
+              <div><span>Contexte</span><strong>Gameplay en test</strong></div>
+              <div><span>Rôle</span><strong>Prototype interactif</strong></div>
+              <div><span>Résultat</span><strong>Prise en main plus nette</strong></div>
+            </div>
+            <details>
+              <summary>Aperçu détaillé</summary>
+              <p>Tests rapides des boucles d'action pour affiner les sensations, le feedback et la compréhension du joueur.</p>
+            </details>
             <div class="tags">
               <span class="tag">Jeu vidéo</span>
               <span class="tag">Prototype</span>
             </div>
-          </a>
+          </article>
 
-          <a class="project reveal" href="https://github.com/Nilujien/QRWarning" target="_blank" rel="noopener">
+          <article class="project reveal" data-domains="uiux,tools">
             <div class="project-top">
               <h3>QRWarning</h3>
-              <svg class="arrow" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg>
+              <a class="project-link" href="https://github.com/Nilujien/QRWarning" target="_blank" rel="noopener" aria-label="Voir le projet QRWarning sur GitHub">
+                <svg class="arrow" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg>
+              </a>
             </div>
             <p>
               Une petite démonstration autour des QR codes et de la prudence numérique.
               Un sujet léger en apparence, traité avec une page claire et directe.
             </p>
+            <div class="project-meta">
+              <div><span>Contexte</span><strong>Sensibilisation rapide</strong></div>
+              <div><span>Rôle</span><strong>UX pédagogique</strong></div>
+              <div><span>Résultat</span><strong>Message immédiat</strong></div>
+            </div>
+            <details>
+              <summary>Aperçu détaillé</summary>
+              <p>Travail sur la clarté du message et le rythme de lecture pour maximiser la compréhension en quelques secondes.</p>
+            </details>
             <div class="tags">
               <span class="tag">Web</span>
               <span class="tag">Sensibilisation</span>
             </div>
-          </a>
+          </article>
 
-          <a class="project reveal" href="https://github.com/Nilujien/CSV_SeparatorChange" target="_blank" rel="noopener">
+          <article class="project reveal" data-domains="tools">
             <div class="project-top">
               <h3>GDL Multitool</h3>
-              <svg class="arrow" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg>
+              <a class="project-link" href="https://github.com/Nilujien/CSV_SeparatorChange" target="_blank" rel="noopener" aria-label="Voir le projet GDL Multitool sur GitHub">
+                <svg class="arrow" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg>
+              </a>
             </div>
             <p>
               Une boîte à outils pratiques née d'un besoin réel, pour traiter et convertir des fichiers
               du quotidien. Un projet qui grandit au fil des petites améliorations.
             </p>
+            <div class="project-meta">
+              <div><span>Contexte</span><strong>Besoin opérationnel</strong></div>
+              <div><span>Rôle</span><strong>Automatisation utile</strong></div>
+              <div><span>Résultat</span><strong>Temps de traitement réduit</strong></div>
+            </div>
+            <details>
+              <summary>Aperçu détaillé</summary>
+              <p>Améliorations guidées par l'usage quotidien pour garder une interface simple et des actions très ciblées.</p>
+            </details>
             <div class="tags">
               <span class="tag">Python</span>
               <span class="tag">Outils</span>
             </div>
-          </a>
+          </article>
 
-          <a class="project reveal" href="https://github.com/Nilujien" target="_blank" rel="noopener">
+          <article class="project reveal" data-domains="uiux,game,simulation,tools">
             <div class="project-top">
               <h3>Et la suite</h3>
-              <svg class="arrow" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg>
+              <a class="project-link" href="https://github.com/Nilujien" target="_blank" rel="noopener" aria-label="Voir les prochains projets sur GitHub">
+                <svg class="arrow" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg>
+              </a>
             </div>
             <p>
               D'autres idées sont en chantier. Le profil GitHub reste l'endroit le plus à jour
               pour suivre ce que je construis en ce moment.
             </p>
+            <div class="project-meta">
+              <div><span>Contexte</span><strong>Exploration continue</strong></div>
+              <div><span>Rôle</span><strong>Veille + prototypage</strong></div>
+              <div><span>Résultat</span><strong>Pipeline actif</strong></div>
+            </div>
+            <details>
+              <summary>Aperçu détaillé</summary>
+              <p>De nouveaux essais sont publiés au fil de l'eau pour tester des idées UI/UX, gameplay et simulation.</p>
+            </details>
             <div class="tags">
               <span class="tag">En cours</span>
             </div>
-          </a>
+          </article>
         </div>
+      </div>
+    </section>
+
+    <section id="interaction" class="interaction">
+      <div class="wrap interaction-grid">
+        <div class="interaction-card reveal">
+          <span class="label">Interaction visiteur</span>
+          <h2>Quel univers voulez-vous explorer en premier ?</h2>
+          <p>Votre choix applique un parcours personnalisé dans la section projets.</p>
+          <div class="vote-actions" role="group" aria-label="Choisir un univers">
+            <button class="vote-btn" data-preference="uiux">UI/UX</button>
+            <button class="vote-btn" data-preference="game">Jeu</button>
+            <button class="vote-btn" data-preference="simulation">Simulation</button>
+            <button class="vote-btn" data-preference="tools">Outils</button>
+          </div>
+          <p class="vote-result" id="vote-result">Aucun choix enregistré pour l'instant.</p>
+        </div>
+        <aside class="metrics-card reveal" aria-live="polite">
+          <h3>Indicateurs d'interaction</h3>
+          <div class="row"><span>Temps sur projets</span><strong id="metric-time">0s</strong></div>
+          <div class="row"><span>Clics GitHub</span><strong id="metric-github">0</strong></div>
+          <div class="row"><span>Interactions</span><strong id="metric-interactions">0</strong></div>
+        </aside>
       </div>
     </section>
 
