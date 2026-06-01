@@ -105,6 +105,7 @@ img { max-width: 100%; display: block; }
   background: radial-gradient(closest-side, rgba(110, 168, 254, .22), transparent 70%);
   filter: blur(10px);
   pointer-events: none;
+  animation: drift-glow 14s ease-in-out infinite;
 }
 
 .hero::after {
@@ -114,6 +115,12 @@ img { max-width: 100%; display: block; }
   height: 560px;
   background: radial-gradient(closest-side, rgba(192, 139, 255, .18), transparent 70%);
   pointer-events: none;
+  animation: drift-glow 18s ease-in-out infinite reverse;
+}
+
+@keyframes drift-glow {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(24px, 18px, 0); }
 }
 
 .hero-inner { position: relative; max-width: 760px; }
@@ -136,10 +143,17 @@ img { max-width: 100%; display: block; }
 }
 
 .hero h1 .grad {
-  background: linear-gradient(120deg, var(--accent), var(--accent-2));
+  background: linear-gradient(120deg, var(--accent), var(--accent-2), var(--accent));
+  background-size: 220% 100%;
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+  animation: grad-shift 8s ease infinite;
+}
+
+@keyframes grad-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
 }
 
 .hero p {
@@ -164,7 +178,10 @@ img { max-width: 100%; display: block; }
   border-radius: 14px;
   padding: 16px;
   backdrop-filter: blur(4px);
+  transition: transform .25s var(--ease), border-color .25s var(--ease);
 }
+
+.principles article:hover { transform: translateY(-3px); border-color: var(--accent); }
 
 .principles article span {
   color: var(--accent);
@@ -184,9 +201,8 @@ img { max-width: 100%; display: block; }
 }
 
 .hero-lab {
-  margin-top: 28px;
-  width: 220px;
-  height: 110px;
+  margin: 28px 0 0;
+  width: 240px;
   border: 1px solid var(--line);
   border-radius: 14px;
   background: linear-gradient(140deg, rgba(21, 23, 29, .9), rgba(31, 35, 44, .55));
@@ -196,12 +212,31 @@ img { max-width: 100%; display: block; }
   transition: transform .35s var(--ease);
 }
 
-.hero-lab p {
-  margin: 12px 12px 0;
+.hero-lab-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 12px 14px 0;
   font-size: .74rem;
   color: var(--muted);
   letter-spacing: .08em;
   text-transform: uppercase;
+}
+
+.hero-lab-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 0 rgba(110, 168, 254, .55);
+  animation: pulse-dot 2.4s ease-out infinite;
+}
+
+.hero-lab-stage {
+  position: relative;
+  height: 96px;
+  overflow: hidden;
 }
 
 .hero-orb {
@@ -216,14 +251,37 @@ img { max-width: 100%; display: block; }
   right: 12px;
   bottom: -16px;
   background: radial-gradient(circle at 30% 30%, rgba(192, 139, 255, .9), rgba(110, 168, 254, .3));
+  animation: float-orb 7s ease-in-out infinite;
 }
 
 .orb-soft {
   width: 70px;
   height: 70px;
   left: 16px;
-  bottom: 10px;
+  bottom: 6px;
   background: radial-gradient(circle at 30% 30%, rgba(110, 168, 254, .72), rgba(110, 168, 254, .08));
+  animation: float-orb 9s ease-in-out infinite reverse;
+}
+
+.orb-spark {
+  width: 34px;
+  height: 34px;
+  left: 46%;
+  top: 8px;
+  background: radial-gradient(circle at 35% 35%, rgba(255, 255, 255, .65), rgba(192, 139, 255, .15));
+  animation: float-orb 5.5s ease-in-out infinite .4s;
+}
+
+@keyframes float-orb {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  33% { transform: translate3d(10px, -12px, 0) scale(1.08); }
+  66% { transform: translate3d(-8px, 6px, 0) scale(.94); }
+}
+
+@keyframes pulse-dot {
+  0% { box-shadow: 0 0 0 0 rgba(110, 168, 254, .5); }
+  70% { box-shadow: 0 0 0 9px rgba(110, 168, 254, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(110, 168, 254, 0); }
 }
 
 .btn {
@@ -611,9 +669,23 @@ section { padding: 88px 0; }
 
 .reveal.in { opacity: 1; transform: none; }
 
+/* Staggered entrance for grouped cards */
+.passions .passion:nth-child(2),
+.projects .project:nth-child(2) { transition-delay: .08s; }
+.passions .passion:nth-child(3),
+.projects .project:nth-child(3) { transition-delay: .16s; }
+.projects .project:nth-child(4) { transition-delay: .12s; }
+.projects .project:nth-child(5) { transition-delay: .2s; }
+.projects .project:nth-child(6) { transition-delay: .28s; }
+
 @media (prefers-reduced-motion: reduce) {
   .reveal { opacity: 1; transform: none; transition: none; }
   html { scroll-behavior: auto; }
+  .hero h1 .grad,
+  .hero::before,
+  .hero::after,
+  .hero-orb,
+  .hero-lab-dot { animation: none; }
 }
 
 /* Responsive */

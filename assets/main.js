@@ -240,6 +240,34 @@
     saveMetrics();
   }
 
+  // Count-up animation when the metrics card first enters the viewport
+  var metricsCard = document.querySelector(".metrics-card");
+  if (metricsCard && "IntersectionObserver" in window && !prefersReducedMotion) {
+    var countObserver = new IntersectionObserver(function (entries, obs) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        obs.disconnect();
+        animateCount(metricTime, Math.round(localMetrics.projectsTimeMs / 1000), "s");
+        animateCount(metricGithub, localMetrics.githubClicks, "");
+        animateCount(metricInteractions, localMetrics.interactions, "");
+      });
+    }, { threshold: 0.4 });
+    countObserver.observe(metricsCard);
+  }
+
+  function animateCount(el, target, suffix) {
+    if (!el || target <= 0) return;
+    var start = performance.now();
+    var duration = 900;
+    function step(now) {
+      var progress = Math.min((now - start) / duration, 1);
+      var eased = 1 - Math.pow(1 - progress, 3);
+      el.textContent = Math.round(target * eased) + suffix;
+      if (progress < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
   var projectEntryStart = 0;
   var projectsInView = false;
   var projectsObserverSupported = "IntersectionObserver" in window;
