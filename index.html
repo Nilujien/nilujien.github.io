@@ -15,6 +15,9 @@
   <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
+  <div class="scroll-progress" aria-hidden="true"><span id="scroll-progress-bar"></span></div>
+  <div class="cursor-glow" aria-hidden="true"></div>
+
   <header class="site-header">
     <div class="wrap nav">
       <a class="brand" href="#top">Julie<span>.</span></a>
@@ -34,6 +37,7 @@
 
   <main id="top">
     <section class="hero">
+      <canvas class="hero-canvas" aria-hidden="true"></canvas>
       <div class="wrap hero-inner">
         <span class="eyebrow">UI/UX · Jeu vidéo · Simulation</span>
         <h1>Je conçois des interfaces et des mondes qui <span class="grad">prennent vie</span>.</h1>
@@ -76,6 +80,31 @@
         </figure>
       </div>
     </section>
+
+    <div class="marquee" aria-hidden="true">
+      <div class="marquee-track">
+        <span>UI/UX Design</span><span aria-hidden="true">·</span>
+        <span>JavaScript</span><span aria-hidden="true">·</span>
+        <span>Canvas</span><span aria-hidden="true">·</span>
+        <span>Simulation</span><span aria-hidden="true">·</span>
+        <span>Three.js</span><span aria-hidden="true">·</span>
+        <span>WebGL</span><span aria-hidden="true">·</span>
+        <span>Game Design</span><span aria-hidden="true">·</span>
+        <span>Python</span><span aria-hidden="true">·</span>
+        <span>Prototypage</span><span aria-hidden="true">·</span>
+        <span>Systèmes émergents</span><span aria-hidden="true">·</span>
+        <span>UI/UX Design</span><span aria-hidden="true">·</span>
+        <span>JavaScript</span><span aria-hidden="true">·</span>
+        <span>Canvas</span><span aria-hidden="true">·</span>
+        <span>Simulation</span><span aria-hidden="true">·</span>
+        <span>Three.js</span><span aria-hidden="true">·</span>
+        <span>WebGL</span><span aria-hidden="true">·</span>
+        <span>Game Design</span><span aria-hidden="true">·</span>
+        <span>Python</span><span aria-hidden="true">·</span>
+        <span>Prototypage</span><span aria-hidden="true">·</span>
+        <span>Systèmes émergents</span><span aria-hidden="true">·</span>
+      </div>
+    </div>
 
     <section id="passions">
       <div class="wrap">
@@ -387,6 +416,10 @@
       </div>
     </div>
   </footer>
+
+  <button class="to-top" id="to-top" aria-label="Revenir en haut de la page">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>
+  </button>
 
   <script src="assets/main.js"></script>
 </body>
