@@ -339,4 +339,194 @@
   }
 
   renderMetrics();
+
+  // Scroll progress bar
+  var progressBar = document.getElementById("scroll-progress-bar");
+  var toTop = document.getElementById("to-top");
+
+  function onScroll() {
+    var doc = document.documentElement;
+    var scrollable = doc.scrollHeight - doc.clientHeight;
+    var ratio = scrollable > 0 ? doc.scrollTop / scrollable : 0;
+    if (progressBar) progressBar.style.width = (ratio * 100).toFixed(2) + "%";
+    if (toTop) toTop.classList.toggle("is-visible", doc.scrollTop > 600);
+  }
+
+  window.addEventListener("scroll", onScroll, { passive: true });
+  onScroll();
+
+  if (toTop) {
+    toTop.addEventListener("click", function () {
+      window.scrollTo({ top: 0, behavior: prefersReducedMotion ? "auto" : "smooth" });
+    });
+  }
+
+  // Cursor spotlight glow
+  var cursorGlow = document.querySelector(".cursor-glow");
+  if (cursorGlow && !prefersReducedMotion && window.matchMedia("(pointer: fine)").matches) {
+    window.addEventListener("pointermove", function (e) {
+      cursorGlow.style.transform = "translate3d(" + e.clientX + "px," + e.clientY + "px,0) translate(-50%,-50%)";
+      cursorGlow.classList.add("is-visible");
+    }, { passive: true });
+    document.addEventListener("pointerleave", function () {
+      cursorGlow.classList.remove("is-visible");
+    });
+  }
+
+  // Interactive 3D tilt on cards
+  if (!prefersReducedMotion && window.matchMedia("(pointer: fine)").matches) {
+    var tiltCards = document.querySelectorAll(".project, .passion, .principles article");
+    tiltCards.forEach(function (card) {
+      card.classList.add("tilt");
+      card.addEventListener("pointermove", function (e) {
+        var rect = card.getBoundingClientRect();
+        var px = (e.clientX - rect.left) / rect.width;
+        var py = (e.clientY - rect.top) / rect.height;
+        card.style.setProperty("--ry", ((px - 0.5) * 7).toFixed(2) + "deg");
+        card.style.setProperty("--rx", ((0.5 - py) * 7).toFixed(2) + "deg");
+        card.style.setProperty("--mx", (px * 100).toFixed(1) + "%");
+        card.style.setProperty("--my", (py * 100).toFixed(1) + "%");
+        card.classList.add("is-tilting");
+      });
+      card.addEventListener("pointerleave", function () {
+        card.style.setProperty("--rx", "0deg");
+        card.style.setProperty("--ry", "0deg");
+        card.classList.remove("is-tilting");
+      });
+    });
+  }
+
+  // Magnetic primary buttons
+  if (!prefersReducedMotion && window.matchMedia("(pointer: fine)").matches) {
+    document.querySelectorAll(".btn-primary").forEach(function (btn) {
+      btn.addEventListener("pointermove", function (e) {
+        var rect = btn.getBoundingClientRect();
+        var mx = e.clientX - rect.left - rect.width / 2;
+        var my = e.clientY - rect.top - rect.height / 2;
+        btn.style.transform = "translate(" + (mx * 0.2).toFixed(1) + "px," + (my * 0.3 - 2).toFixed(1) + "px)";
+      });
+      btn.addEventListener("pointerleave", function () {
+        btn.style.transform = "";
+      });
+    });
+  }
+
+  // Hero interactive particle field
+  var heroCanvas = document.querySelector(".hero-canvas");
+  if (heroCanvas && heroCanvas.getContext && !prefersReducedMotion) {
+    var ctx = heroCanvas.getContext("2d");
+    var heroEl = document.querySelector(".hero");
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var particles = [];
+    var pointer = { x: -999, y: -999 };
+    var width = 0;
+    var height = 0;
+    var rafId = 0;
+    var running = false;
+
+    function sizeCanvas() {
+      if (!heroEl) return;
+      var rect = heroEl.getBoundingClientRect();
+      width = rect.width;
+      height = rect.height;
+      heroCanvas.width = Math.round(width * dpr);
+      heroCanvas.height = Math.round(height * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      var count = Math.max(28, Math.min(72, Math.round(width / 18)));
+      particles = [];
+      for (var i = 0; i < count; i++) {
+        particles.push({
+          x: Math.random() * width,
+          y: Math.random() * height,
+          vx: (Math.random() - 0.5) * 0.35,
+          vy: (Math.random() - 0.5) * 0.35,
+          r: Math.random() * 1.8 + 0.6
+        });
+      }
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, width, height);
+      for (var i = 0; i < particles.length; i++) {
+        var p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        if (p.x < 0 || p.x > width) p.vx *= -1;
+        if (p.y < 0 || p.y > height) p.vy *= -1;
+
+        var dxp = p.x - pointer.x;
+        var dyp = p.y - pointer.y;
+        var distP = Math.sqrt(dxp * dxp + dyp * dyp);
+        if (distP < 120) {
+          var force = (120 - distP) / 120 * 0.6;
+          p.x += (dxp / (distP || 1)) * force;
+          p.y += (dyp / (distP || 1)) * force;
+        }
+
+        for (var j = i + 1; j < particles.length; j++) {
+          var q = particles[j];
+          var dx = p.x - q.x;
+          var dy = p.y - q.y;
+          var dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 116) {
+            ctx.strokeStyle = "rgba(110,168,254," + (0.16 * (1 - dist / 116)).toFixed(3) + ")";
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(p.x, p.y);
+            ctx.lineTo(q.x, q.y);
+            ctx.stroke();
+          }
+        }
+
+        ctx.fillStyle = "rgba(192,139,255,.55)";
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      rafId = requestAnimationFrame(draw);
+    }
+
+    function startHero() {
+      if (running) return;
+      running = true;
+      draw();
+    }
+
+    function stopHero() {
+      running = false;
+      cancelAnimationFrame(rafId);
+    }
+
+    if (heroEl) {
+      heroEl.addEventListener("pointermove", function (e) {
+        var rect = heroEl.getBoundingClientRect();
+        pointer.x = e.clientX - rect.left;
+        pointer.y = e.clientY - rect.top;
+      });
+      heroEl.addEventListener("pointerleave", function () {
+        pointer.x = -999;
+        pointer.y = -999;
+      });
+    }
+
+    var resizeTimer;
+    window.addEventListener("resize", function () {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(sizeCanvas, 200);
+    });
+
+    if ("IntersectionObserver" in window && heroEl) {
+      var heroObserver = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) startHero();
+          else stopHero();
+        });
+      }, { threshold: 0 });
+      heroObserver.observe(heroEl);
+    } else {
+      startHero();
+    }
+
+    sizeCanvas();
+  }
 })();
