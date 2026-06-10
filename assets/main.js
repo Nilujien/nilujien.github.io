@@ -873,6 +873,7 @@
     var SEED_CELLS = 8;
     var SEED_FOOD = 12;
     var FOOD_SPAWN_EVERY = 1100;
+    var FOOD_CLICK_BUFFER = 8;
     var FOOD_ENERGY = 34;
     var SPLIT_ENERGY = 110;
     var ENERGY_DRAIN = 0.045;
@@ -1108,7 +1109,7 @@
       var x = e.clientX - rect.left;
       var y = e.clientY - rect.top;
       for (var i = 0; i < 4; i++) {
-        if (foods.length >= MAX_FOOD + 8) break;
+        if (foods.length >= MAX_FOOD + FOOD_CLICK_BUFFER) break;
         spawnFood(
           Math.max(8, Math.min(labW - 8, x + (Math.random() - 0.5) * 36)),
           Math.max(8, Math.min(labH - 8, y + (Math.random() - 0.5) * 36))
