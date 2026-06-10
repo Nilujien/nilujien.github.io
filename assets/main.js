@@ -774,6 +774,11 @@
     if (fxCtx) fxCtx.setTransform(fxDpr, 0, 0, fxDpr, 0, 0);
   }
 
+  var CONFETTI_BASE_DECAY = 0.008;
+  var CONFETTI_DECAY_RANGE = 0.008;
+  var SPARKLE_BASE_DECAY = 0.025;
+  var SPARKLE_DECAY_RANGE = 0.02;
+
   function spawnBurst(x, y, count, confetti) {
     if (!fxCtx || prefersReducedMotion) return;
     for (var i = 0; i < count; i++) {
@@ -785,7 +790,9 @@
         vx: Math.cos(angle) * speed,
         vy: Math.sin(angle) * speed - (confetti ? 3 : 1),
         life: 1,
-        decay: confetti ? 0.008 + Math.random() * 0.008 : 0.025 + Math.random() * 0.02,
+        decay: confetti
+          ? CONFETTI_BASE_DECAY + Math.random() * CONFETTI_DECAY_RANGE
+          : SPARKLE_BASE_DECAY + Math.random() * SPARKLE_DECAY_RANGE,
         size: confetti ? Math.random() * 5 + 3 : Math.random() * 2.4 + 1,
         color: Math.random() < 0.5 ? fxColors.a : fxColors.b,
         spin: Math.random() * Math.PI,
@@ -880,6 +887,11 @@
     var gameRaf = 0;
     var lastSpawn = 0;
     var GAME_DURATION = 30000;
+    var NORMAL_ORB_PROBABILITY = 0.62;
+    var GOLD_ORB_PROBABILITY = 0.82;
+    var INITIAL_SPAWN_INTERVAL = 750;
+    var DIFFICULTY_SCALE = 60;
+    var MIN_SPAWN_INTERVAL = 320;
 
     try {
       gameBest = parseInt(window.localStorage.getItem("orbGameBest"), 10) || 0;
@@ -897,7 +909,7 @@
 
     function spawnOrb(now) {
       var roll = Math.random();
-      var type = roll < 0.62 ? "normal" : roll < 0.82 ? "gold" : "red";
+      var type = roll < NORMAL_ORB_PROBABILITY ? "normal" : roll < GOLD_ORB_PROBABILITY ? "gold" : "red";
       var maxR = type === "gold" ? 15 : type === "red" ? 20 : 19;
       orbs.push({
         x: 30 + Math.random() * (gameW - 60),
@@ -920,7 +932,7 @@
       var remaining = gameEndsAt - now;
 
       var elapsed = GAME_DURATION - remaining;
-      var spawnEvery = Math.max(750 - elapsed / 60, 320);
+      var spawnEvery = Math.max(INITIAL_SPAWN_INTERVAL - elapsed / DIFFICULTY_SCALE, MIN_SPAWN_INTERVAL);
       if (now - lastSpawn > spawnEvery) {
         spawnOrb(now);
         lastSpawn = now;
