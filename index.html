@@ -27,6 +27,10 @@
         <a href="#projets">Projets</a>
         <a href="#interaction">Interaction</a>
         <a href="#apropos">À propos</a>
+        <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Changer d'ambiance visuelle" title="Changer d'ambiance">
+          <span class="theme-dot" aria-hidden="true"></span>
+          <span class="theme-name" id="theme-name">Nuit</span>
+        </button>
         <a class="nav-cta" href="https://github.com/Nilujien" target="_blank" rel="noopener">GitHub</a>
       </nav>
       <button class="nav-toggle" aria-label="Ouvrir le menu" aria-controls="menu" aria-expanded="false">
@@ -40,7 +44,7 @@
       <canvas class="hero-canvas" aria-hidden="true"></canvas>
       <div class="wrap hero-inner">
         <span class="eyebrow">UI/UX · Jeu vidéo · Simulation</span>
-        <h1>Je conçois des interfaces et des mondes qui <span class="grad">prennent vie</span>.</h1>
+        <h1>Je conçois <span class="type-wrap"><span id="typewriter">des interfaces et des mondes</span><span class="type-caret" aria-hidden="true"></span></span> qui <span class="grad">prennent vie</span>.</h1>
         <p>
           Je passe mon temps libre à imaginer des outils soignés et des systèmes vivants.
           Chaque projet est une occasion d'explorer une idée, de peaufiner une interface
@@ -372,7 +376,33 @@
           <div class="row"><span>Temps sur projets</span><strong id="metric-time">0s</strong></div>
           <div class="row"><span>Clics GitHub</span><strong id="metric-github">0</strong></div>
           <div class="row"><span>Interactions</span><strong id="metric-interactions">0</strong></div>
+          <div class="achievements">
+            <h4>Succès débloqués</h4>
+            <ul id="achievement-list" aria-label="Liste des succès"></ul>
+          </div>
         </aside>
+
+        <div class="game-card reveal" id="jeu">
+          <div class="game-head">
+            <div class="game-intro">
+              <span class="label">Mini-jeu</span>
+              <h3>Chasse aux orbes</h3>
+              <p>Attrapez un maximum d'orbes avant la fin du chrono. Les dorées valent triple, les rouges piègent.</p>
+            </div>
+            <div class="game-stats" aria-live="polite">
+              <div><span>Score</span><strong id="game-score">0</strong></div>
+              <div><span>Record</span><strong id="game-best">0</strong></div>
+              <div><span>Temps</span><strong id="game-time">30s</strong></div>
+            </div>
+          </div>
+          <div class="game-stage">
+            <canvas id="game-canvas" aria-label="Zone de jeu : cliquez ou touchez les orbes pour les attraper"></canvas>
+            <div class="game-overlay" id="game-overlay">
+              <p id="game-message">Prêt·e à jouer ? 30 secondes, un pointeur, des orbes.</p>
+              <button class="btn btn-primary" id="game-start" type="button">Lancer la partie</button>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -410,12 +440,16 @@
   <footer class="site-footer">
     <div class="wrap footer-inner">
       <p>Conçu et codé par Julie.</p>
+      <p class="footer-secret" title="Un secret se cache dans cette séquence…" aria-hidden="true">↑ ↑ ↓ ↓ ← → ← → B A</p>
       <div class="footer-links">
         <a href="https://github.com/Nilujien" target="_blank" rel="noopener">GitHub</a>
         <a href="#top">Haut de page</a>
       </div>
     </div>
   </footer>
+
+  <canvas class="fx-canvas" id="fx-canvas" aria-hidden="true"></canvas>
+  <div class="toast-stack" id="toast-stack" aria-live="polite"></div>
 
   <button class="to-top" id="to-top" aria-label="Revenir en haut de la page">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>

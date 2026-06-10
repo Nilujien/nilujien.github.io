@@ -3,6 +3,17 @@
 
   var prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+  // Theme-aware accent colors, shared by every canvas effect
+  var fxColors = { a: "110,168,254", b: "192,139,255" };
+
+  function refreshFxColors() {
+    var styles = getComputedStyle(document.documentElement);
+    var a = styles.getPropertyValue("--accent-rgb").trim();
+    var b = styles.getPropertyValue("--accent-2-rgb").trim();
+    if (a) fxColors.a = a;
+    if (b) fxColors.b = b;
+  }
+
   // Menu mobile
   var toggle = document.querySelector(".nav-toggle");
   var links = document.querySelector(".nav-links");
@@ -469,7 +480,7 @@
           var dy = p.y - q.y;
           var dist = Math.sqrt(dx * dx + dy * dy);
           if (dist < 116) {
-            ctx.strokeStyle = "rgba(110,168,254," + (0.16 * (1 - dist / 116)).toFixed(3) + ")";
+            ctx.strokeStyle = "rgba(" + fxColors.a + "," + (0.16 * (1 - dist / 116)).toFixed(3) + ")";
             ctx.lineWidth = 1;
             ctx.beginPath();
             ctx.moveTo(p.x, p.y);
@@ -478,7 +489,7 @@
           }
         }
 
-        ctx.fillStyle = "rgba(192,139,255,.55)";
+        ctx.fillStyle = "rgba(" + fxColors.b + ",.55)";
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
         ctx.fill();
@@ -528,5 +539,521 @@
     }
 
     sizeCanvas();
+  }
+
+  /* ====================================================
+     Immersive layer: themes, typewriter, sparkles,
+     achievements, mini-game, easter egg
+     ==================================================== */
+
+  refreshFxColors();
+
+  // ---------- Achievements ----------
+  var achievementDefs = [
+    { id: "explorer", icon: "\uD83E\uDDED", name: "Explorateur", desc: "Atteindre le bas de la page" },
+    { id: "curious", icon: "\uD83D\uDD0D", name: "Curieux", desc: "Ouvrir 3 aper\u00e7us d\u00e9taill\u00e9s" },
+    { id: "player", icon: "\uD83C\uDFAE", name: "Joueur", desc: "Terminer une partie du mini-jeu" },
+    { id: "champion", icon: "\uD83C\uDFC6", name: "Champion", desc: "Marquer 15 points ou plus" },
+    { id: "chameleon", icon: "\uD83C\uDFA8", name: "Cam\u00e9l\u00e9on", desc: "Changer d'ambiance" },
+    { id: "hacker", icon: "\uD83D\uDD79\uFE0F", name: "Hacker", desc: "Trouver le code secret" }
+  ];
+
+  var unlockedAchievements = [];
+  try {
+    unlockedAchievements = JSON.parse(window.localStorage.getItem("portfolioAchievements") || "[]");
+    if (!Array.isArray(unlockedAchievements)) unlockedAchievements = [];
+  } catch (e) { unlockedAchievements = []; }
+
+  var achievementList = document.getElementById("achievement-list");
+  var toastStack = document.getElementById("toast-stack");
+
+  function renderAchievements() {
+    if (!achievementList) return;
+    achievementList.innerHTML = "";
+    achievementDefs.forEach(function (def) {
+      var li = document.createElement("li");
+      li.textContent = def.icon + " " + def.name;
+      li.title = def.desc;
+      if (unlockedAchievements.indexOf(def.id) !== -1) li.classList.add("unlocked");
+      achievementList.appendChild(li);
+    });
+  }
+
+  function showToast(icon, title, subtitle) {
+    if (!toastStack) return;
+    var toast = document.createElement("div");
+    toast.className = "toast";
+    var iconEl = document.createElement("span");
+    iconEl.className = "toast-icon";
+    iconEl.textContent = icon;
+    var body = document.createElement("div");
+    var strong = document.createElement("strong");
+    strong.textContent = title;
+    var small = document.createElement("small");
+    small.textContent = subtitle;
+    body.appendChild(strong);
+    body.appendChild(small);
+    toast.appendChild(iconEl);
+    toast.appendChild(body);
+    toastStack.appendChild(toast);
+    requestAnimationFrame(function () { toast.classList.add("show"); });
+    setTimeout(function () {
+      toast.classList.remove("show");
+      setTimeout(function () { toast.remove(); }, 450);
+    }, 3800);
+  }
+
+  function unlockAchievement(id) {
+    if (unlockedAchievements.indexOf(id) !== -1) return;
+    var def = null;
+    achievementDefs.forEach(function (item) { if (item.id === id) def = item; });
+    if (!def) return;
+    unlockedAchievements.push(id);
+    try {
+      window.localStorage.setItem("portfolioAchievements", JSON.stringify(unlockedAchievements));
+    } catch (e) {}
+    renderAchievements();
+    showToast(def.icon, "Succ\u00e8s d\u00e9bloqu\u00e9 : " + def.name, def.desc);
+    spawnBurst(window.innerWidth - 90, 110, 26, false);
+  }
+
+  renderAchievements();
+
+  // Explorer: reach the bottom of the page
+  var explorerDone = unlockedAchievements.indexOf("explorer") !== -1;
+  window.addEventListener("scroll", function () {
+    if (explorerDone) return;
+    var doc = document.documentElement;
+    if (doc.scrollTop + doc.clientHeight >= doc.scrollHeight - 40) {
+      explorerDone = true;
+      unlockAchievement("explorer");
+    }
+  }, { passive: true });
+
+  // Curious: open 3 project details
+  var detailsOpened = 0;
+  document.querySelectorAll(".project details").forEach(function (details) {
+    details.addEventListener("toggle", function () {
+      if (!details.open) return;
+      detailsOpened += 1;
+      if (detailsOpened >= 3) unlockAchievement("curious");
+    });
+  });
+
+  // ---------- Theme ambiances ----------
+  var themes = [
+    { id: "", name: "Nuit" },
+    { id: "neon", name: "N\u00e9on" },
+    { id: "sunset", name: "Cr\u00e9puscule" }
+  ];
+  var themeToggle = document.getElementById("theme-toggle");
+  var themeName = document.getElementById("theme-name");
+  var themeIndex = 0;
+
+  function applyTheme(index, silent) {
+    themeIndex = ((index % themes.length) + themes.length) % themes.length;
+    var theme = themes[themeIndex];
+    if (theme.id) document.documentElement.setAttribute("data-theme", theme.id);
+    else document.documentElement.removeAttribute("data-theme");
+    if (themeName) themeName.textContent = theme.name;
+    try { window.localStorage.setItem("portfolioTheme", String(themeIndex)); } catch (e) {}
+    refreshFxColors();
+    if (!silent) unlockAchievement("chameleon");
+  }
+
+  try {
+    var savedTheme = parseInt(window.localStorage.getItem("portfolioTheme"), 10);
+    if (!isNaN(savedTheme) && savedTheme > 0) applyTheme(savedTheme, true);
+  } catch (e) {}
+
+  if (themeToggle) {
+    themeToggle.addEventListener("click", function () {
+      applyTheme(themeIndex + 1, false);
+      trackInteraction();
+    });
+  }
+
+  // ---------- Typewriter hero ----------
+  var typewriterEl = document.getElementById("typewriter");
+  if (typewriterEl && !prefersReducedMotion) {
+    var typeWords = [
+      "des interfaces et des mondes",
+      "des syst\u00e8mes vivants",
+      "des prototypes joueurs",
+      "des exp\u00e9riences immersives"
+    ];
+    var typeWordIndex = 0;
+    var typeCharIndex = typeWords[0].length;
+    var typeDeleting = false;
+
+    function typeTick() {
+      var word = typeWords[typeWordIndex];
+      if (typeDeleting) {
+        typeCharIndex -= 1;
+        typewriterEl.textContent = word.slice(0, typeCharIndex);
+        if (typeCharIndex <= 0) {
+          typeDeleting = false;
+          typeWordIndex = (typeWordIndex + 1) % typeWords.length;
+          setTimeout(typeTick, 350);
+          return;
+        }
+        setTimeout(typeTick, 26);
+      } else {
+        word = typeWords[typeWordIndex];
+        typeCharIndex += 1;
+        typewriterEl.textContent = word.slice(0, typeCharIndex);
+        if (typeCharIndex >= word.length) {
+          typeDeleting = true;
+          setTimeout(typeTick, 2600);
+          return;
+        }
+        setTimeout(typeTick, 46);
+      }
+    }
+
+    setTimeout(function () {
+      typeDeleting = true;
+      typeTick();
+    }, 2400);
+  }
+
+  // ---------- Scramble-in section headings ----------
+  if (!prefersReducedMotion && "IntersectionObserver" in window) {
+    var scrambleChars = "!<>-_/[]{}\u2014=+*^?#";
+
+    function scrambleHeading(el) {
+      var original = el.textContent;
+      var frame = 0;
+      var totalFrames = 18;
+      el.classList.add("scrambling");
+      function step() {
+        var out = "";
+        for (var i = 0; i < original.length; i++) {
+          if (original[i] === " " || i < (frame / totalFrames) * original.length) {
+            out += original[i];
+          } else {
+            out += scrambleChars[Math.floor(Math.random() * scrambleChars.length)];
+          }
+        }
+        el.textContent = out;
+        frame += 1;
+        if (frame <= totalFrames) {
+          requestAnimationFrame(step);
+        } else {
+          el.textContent = original;
+          el.classList.remove("scrambling");
+        }
+      }
+      step();
+    }
+
+    var scrambleObserver = new IntersectionObserver(function (entries, obs) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        obs.unobserve(entry.target);
+        scrambleHeading(entry.target);
+      });
+    }, { threshold: 0.6 });
+
+    document.querySelectorAll(".section-head h2, .interaction-card h2").forEach(function (h2) {
+      scrambleObserver.observe(h2);
+    });
+  }
+
+  // ---------- FX canvas: sparkles + confetti ----------
+  var fxCanvas = document.getElementById("fx-canvas");
+  var fxCtx = fxCanvas && fxCanvas.getContext ? fxCanvas.getContext("2d") : null;
+  var fxParticles = [];
+  var fxRunning = false;
+  var fxDpr = Math.min(window.devicePixelRatio || 1, 2);
+
+  function sizeFxCanvas() {
+    if (!fxCanvas) return;
+    fxCanvas.width = Math.round(window.innerWidth * fxDpr);
+    fxCanvas.height = Math.round(window.innerHeight * fxDpr);
+    if (fxCtx) fxCtx.setTransform(fxDpr, 0, 0, fxDpr, 0, 0);
+  }
+
+  function spawnBurst(x, y, count, confetti) {
+    if (!fxCtx || prefersReducedMotion) return;
+    for (var i = 0; i < count; i++) {
+      var angle = Math.random() * Math.PI * 2;
+      var speed = confetti ? Math.random() * 7 + 2 : Math.random() * 3.4 + 1;
+      fxParticles.push({
+        x: x,
+        y: y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed - (confetti ? 3 : 1),
+        life: 1,
+        decay: confetti ? 0.008 + Math.random() * 0.008 : 0.025 + Math.random() * 0.02,
+        size: confetti ? Math.random() * 5 + 3 : Math.random() * 2.4 + 1,
+        color: Math.random() < 0.5 ? fxColors.a : fxColors.b,
+        spin: Math.random() * Math.PI,
+        confetti: !!confetti
+      });
+    }
+    if (!fxRunning) {
+      fxRunning = true;
+      requestAnimationFrame(fxDraw);
+    }
+  }
+
+  function fxDraw() {
+    if (!fxCtx) return;
+    fxCtx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+    for (var i = fxParticles.length - 1; i >= 0; i--) {
+      var p = fxParticles[i];
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vy += p.confetti ? 0.16 : 0.05;
+      p.vx *= 0.99;
+      p.life -= p.decay;
+      p.spin += 0.12;
+      if (p.life <= 0) {
+        fxParticles.splice(i, 1);
+        continue;
+      }
+      fxCtx.globalAlpha = Math.max(p.life, 0);
+      fxCtx.fillStyle = "rgb(" + p.color + ")";
+      if (p.confetti) {
+        fxCtx.save();
+        fxCtx.translate(p.x, p.y);
+        fxCtx.rotate(p.spin);
+        fxCtx.fillRect(-p.size / 2, -p.size / 4, p.size, p.size / 2);
+        fxCtx.restore();
+      } else {
+        fxCtx.beginPath();
+        fxCtx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
+        fxCtx.fill();
+      }
+    }
+    fxCtx.globalAlpha = 1;
+    if (fxParticles.length > 0) {
+      requestAnimationFrame(fxDraw);
+    } else {
+      fxRunning = false;
+      fxCtx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+    }
+  }
+
+  sizeFxCanvas();
+  window.addEventListener("resize", sizeFxCanvas);
+
+  // Sparkles on every click (outside the game stage, which has its own)
+  if (!prefersReducedMotion) {
+    document.addEventListener("pointerdown", function (e) {
+      if (e.target.closest && e.target.closest(".game-stage")) return;
+      spawnBurst(e.clientX, e.clientY, 10, false);
+    }, { passive: true });
+  }
+
+  function confettiShower() {
+    if (prefersReducedMotion) return;
+    for (var i = 0; i < 6; i++) {
+      (function (delay) {
+        setTimeout(function () {
+          spawnBurst(Math.random() * window.innerWidth, window.innerHeight * 0.25, 34, true);
+        }, delay);
+      })(i * 180);
+    }
+  }
+
+  // ---------- Mini-game: orb hunt ----------
+  var gameCanvas = document.getElementById("game-canvas");
+  var gameOverlay = document.getElementById("game-overlay");
+  var gameMessage = document.getElementById("game-message");
+  var gameStartBtn = document.getElementById("game-start");
+  var gameScoreEl = document.getElementById("game-score");
+  var gameBestEl = document.getElementById("game-best");
+  var gameTimeEl = document.getElementById("game-time");
+
+  if (gameCanvas && gameCanvas.getContext && gameOverlay && gameStartBtn) {
+    var gctx = gameCanvas.getContext("2d");
+    var gameDpr = Math.min(window.devicePixelRatio || 1, 2);
+    var gameW = 0;
+    var gameH = 0;
+    var orbs = [];
+    var gameScore = 0;
+    var gameBest = 0;
+    var gameActive = false;
+    var gameEndsAt = 0;
+    var gameRaf = 0;
+    var lastSpawn = 0;
+    var GAME_DURATION = 30000;
+
+    try {
+      gameBest = parseInt(window.localStorage.getItem("orbGameBest"), 10) || 0;
+    } catch (e) {}
+    if (gameBestEl) gameBestEl.textContent = String(gameBest);
+
+    function sizeGameCanvas() {
+      var rect = gameCanvas.getBoundingClientRect();
+      gameW = rect.width;
+      gameH = rect.height;
+      gameCanvas.width = Math.round(gameW * gameDpr);
+      gameCanvas.height = Math.round(gameH * gameDpr);
+      gctx.setTransform(gameDpr, 0, 0, gameDpr, 0, 0);
+    }
+
+    function spawnOrb(now) {
+      var roll = Math.random();
+      var type = roll < 0.62 ? "normal" : roll < 0.82 ? "gold" : "red";
+      var maxR = type === "gold" ? 15 : type === "red" ? 20 : 19;
+      orbs.push({
+        x: 30 + Math.random() * (gameW - 60),
+        y: 30 + Math.random() * (gameH - 60),
+        born: now,
+        ttl: type === "gold" ? 1500 : 2300,
+        maxR: maxR,
+        type: type
+      });
+    }
+
+    function orbRadius(orb, now) {
+      var t = (now - orb.born) / orb.ttl;
+      if (t >= 1) return -1;
+      return Math.max(Math.sin(t * Math.PI) * orb.maxR, 2.5);
+    }
+
+    function drawGame(now) {
+      gctx.clearRect(0, 0, gameW, gameH);
+      var remaining = gameEndsAt - now;
+
+      var elapsed = GAME_DURATION - remaining;
+      var spawnEvery = Math.max(750 - elapsed / 60, 320);
+      if (now - lastSpawn > spawnEvery) {
+        spawnOrb(now);
+        lastSpawn = now;
+      }
+
+      for (var i = orbs.length - 1; i >= 0; i--) {
+        var orb = orbs[i];
+        var r = orbRadius(orb, now);
+        if (r < 0) {
+          orbs.splice(i, 1);
+          continue;
+        }
+        var color = orb.type === "gold" ? "255,209,102" : orb.type === "red" ? "255,99,99" : fxColors.a;
+        var glow = gctx.createRadialGradient(orb.x - r * 0.3, orb.y - r * 0.3, r * 0.1, orb.x, orb.y, r);
+        glow.addColorStop(0, "rgba(255,255,255,.85)");
+        glow.addColorStop(0.35, "rgba(" + color + ",.9)");
+        glow.addColorStop(1, "rgba(" + color + ",.1)");
+        gctx.fillStyle = glow;
+        gctx.beginPath();
+        gctx.arc(orb.x, orb.y, r, 0, Math.PI * 2);
+        gctx.fill();
+      }
+
+      if (gameTimeEl) gameTimeEl.textContent = Math.max(Math.ceil(remaining / 1000), 0) + "s";
+
+      if (remaining <= 0) {
+        endGame();
+        return;
+      }
+      gameRaf = requestAnimationFrame(drawGame);
+    }
+
+    function startGame() {
+      sizeGameCanvas();
+      orbs = [];
+      gameScore = 0;
+      gameActive = true;
+      lastSpawn = 0;
+      if (gameScoreEl) gameScoreEl.textContent = "0";
+      gameOverlay.classList.add("hidden");
+      gameEndsAt = performance.now() + GAME_DURATION;
+      gameRaf = requestAnimationFrame(drawGame);
+      trackInteraction();
+    }
+
+    function endGame() {
+      gameActive = false;
+      cancelAnimationFrame(gameRaf);
+      gctx.clearRect(0, 0, gameW, gameH);
+      orbs = [];
+      var isRecord = gameScore > gameBest;
+      if (isRecord) {
+        gameBest = gameScore;
+        try { window.localStorage.setItem("orbGameBest", String(gameBest)); } catch (e) {}
+        if (gameBestEl) gameBestEl.textContent = String(gameBest);
+      }
+      if (gameMessage) {
+        gameMessage.textContent = isRecord
+          ? "Nouveau record : " + gameScore + " points ! Bravo \uD83C\uDF89"
+          : "Partie termin\u00e9e : " + gameScore + " points. On retente ?";
+      }
+      if (gameStartBtn) gameStartBtn.textContent = "Rejouer";
+      gameOverlay.classList.remove("hidden");
+      unlockAchievement("player");
+      if (gameScore >= 15) unlockAchievement("champion");
+      if (isRecord) confettiShower();
+    }
+
+    gameStartBtn.addEventListener("click", startGame);
+
+    gameCanvas.addEventListener("pointerdown", function (e) {
+      if (!gameActive) return;
+      var rect = gameCanvas.getBoundingClientRect();
+      var x = e.clientX - rect.left;
+      var y = e.clientY - rect.top;
+      var now = performance.now();
+      for (var i = orbs.length - 1; i >= 0; i--) {
+        var orb = orbs[i];
+        var r = orbRadius(orb, now);
+        if (r < 0) continue;
+        var dx = x - orb.x;
+        var dy = y - orb.y;
+        if (dx * dx + dy * dy <= (r + 8) * (r + 8)) {
+          var gain = orb.type === "gold" ? 3 : orb.type === "red" ? -2 : 1;
+          gameScore = Math.max(gameScore + gain, 0);
+          if (gameScoreEl) gameScoreEl.textContent = String(gameScore);
+          spawnBurst(e.clientX, e.clientY, orb.type === "gold" ? 18 : 10, false);
+          orbs.splice(i, 1);
+          return;
+        }
+      }
+    });
+
+    window.addEventListener("resize", function () {
+      if (gameActive) sizeGameCanvas();
+    });
+  }
+
+  // ---------- Konami code easter egg ----------
+  var konamiSequence = ["ArrowUp", "ArrowUp", "ArrowDown", "ArrowDown", "ArrowLeft", "ArrowRight", "ArrowLeft", "ArrowRight", "b", "a"];
+  var konamiProgress = 0;
+
+  function triggerParty() {
+    var on = document.body.classList.toggle("party");
+    unlockAchievement("hacker");
+    if (on) {
+      confettiShower();
+      showToast("\uD83C\uDF89", "Mode f\u00eate activ\u00e9 !", "Refaites la s\u00e9quence pour revenir au calme.");
+    }
+  }
+
+  document.addEventListener("keydown", function (e) {
+    var key = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+    if (key === konamiSequence[konamiProgress]) {
+      konamiProgress += 1;
+      if (konamiProgress === konamiSequence.length) {
+        konamiProgress = 0;
+        triggerParty();
+      }
+    } else {
+      konamiProgress = key === konamiSequence[0] ? 1 : 0;
+    }
+  });
+
+  var footerSecret = document.querySelector(".footer-secret");
+  if (footerSecret) {
+    var secretTaps = 0;
+    footerSecret.addEventListener("click", function () {
+      secretTaps += 1;
+      if (secretTaps >= 3) {
+        secretTaps = 0;
+        triggerParty();
+      }
+    });
   }
 })();
