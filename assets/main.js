@@ -52,24 +52,6 @@
     revealItems.forEach(function (el) { revealObserver.observe(el); });
   }
 
-  // Hero depth interaction
-  var hero = document.querySelector(".hero");
-  var heroLab = document.querySelector(".hero-lab");
-  if (hero && heroLab && !prefersReducedMotion) {
-    hero.addEventListener("pointermove", function (e) {
-      var rect = hero.getBoundingClientRect();
-      var x = (e.clientX - rect.left) / rect.width - 0.5;
-      var y = (e.clientY - rect.top) / rect.height - 0.5;
-      heroLab.style.setProperty("--hx", (x * 14).toFixed(2));
-      heroLab.style.setProperty("--hy", (y * 10).toFixed(2));
-    });
-
-    hero.addEventListener("pointerleave", function () {
-      heroLab.style.setProperty("--hx", "0");
-      heroLab.style.setProperty("--hy", "0");
-    });
-  }
-
   // Process interaction
   var processData = [
     {
@@ -79,17 +61,17 @@
       after: "Structure clarifiée avec chemin principal immédiat.",
       decisions: [
         "Décision UI : renforcer le contraste des actions clés.",
-        "Feedback : lecture plus rapide sur mobile."
+        "Constat : la lecture devient plus rapide, surtout sur mobile."
       ]
     },
     {
       title: "Exploration",
-      text: "Comparer plusieurs pistes d'interface sans perdre le cap produit.",
+      text: "Comparer plusieurs pistes d'interface sans perdre le cap du projet.",
       before: "Hypothèses nombreuses mais peu hiérarchisées.",
-      after: "Scénarios testés puis triés selon impact réel.",
+      after: "Pistes testées puis triées selon leur impact réel.",
       decisions: [
-        "Décision UX : prioriser les flux les plus fréquents.",
-        "Feedback : navigation ressentie plus fluide dès la 1re visite."
+        "Décision UX : prioriser les parcours les plus fréquents.",
+        "Constat : la navigation devient évidente dès la première visite."
       ]
     },
     {
@@ -98,18 +80,18 @@
       before: "Concept prometteur mais abstrait.",
       after: "Parcours tangible avec micro-interactions cohérentes.",
       decisions: [
-        "Décision UI : unifier les transitions et états de focus.",
-        "Feedback : meilleure confiance dans les actions principales."
+        "Décision UI : unifier les transitions et les états de focus.",
+        "Constat : les actions principales inspirent davantage confiance."
       ]
     },
     {
       title: "Itération",
-      text: "Ajuster les détails qui améliorent la sensation premium au quotidien.",
+      text: "Ajuster les détails qui rendent l'usage agréable au quotidien.",
       before: "Expérience correcte, mais encore neutre.",
       after: "Interface plus expressive, précise et mémorable.",
       decisions: [
         "Décision UX : réduire les frictions sur mobile.",
-        "Feedback : interactions jugées plus naturelles et rapides."
+        "Constat : les interactions paraissent plus naturelles et rapides."
       ]
     }
   ];
@@ -862,6 +844,315 @@
           spawnBurst(Math.random() * window.innerWidth, window.innerHeight * 0.25, 34, true);
         }, delay);
       })(i * 180);
+    }
+  }
+
+  // ---------- Petite simulation vivante : mini-écosystème ----------
+  var labCanvas = document.getElementById("lab-canvas");
+  var labPopEl = document.getElementById("lab-pop");
+  var labBirthsEl = document.getElementById("lab-births");
+  var labFoodEl = document.getElementById("lab-food");
+  var labResetBtn = document.getElementById("lab-reset");
+
+  if (labCanvas && labCanvas.getContext) {
+    var lctx = labCanvas.getContext("2d");
+    var labDpr = Math.min(window.devicePixelRatio || 1, 2);
+    var labW = 0;
+    var labH = 0;
+    var cells = [];
+    var foods = [];
+    var labBirths = 0;
+    var labPointer = { x: -999, y: -999 };
+    var labRunning = false;
+    var labRaf = 0;
+    var lastFoodSpawn = 0;
+    var lastStatsUpdate = 0;
+
+    var MAX_CELLS = 34;
+    var MAX_FOOD = 24;
+    var SEED_CELLS = 8;
+    var SEED_FOOD = 12;
+    var FOOD_SPAWN_EVERY = 1100;
+    var FOOD_CLICK_BUFFER = 8;
+    var FOOD_ENERGY = 34;
+    var SPLIT_ENERGY = 110;
+    var ENERGY_DRAIN = 0.045;
+    var SENSE_RADIUS = 140;
+    var POINTER_RADIUS = 120;
+
+    function sizeLabCanvas() {
+      var rect = labCanvas.getBoundingClientRect();
+      labW = rect.width;
+      labH = rect.height;
+      labCanvas.width = Math.round(labW * labDpr);
+      labCanvas.height = Math.round(labH * labDpr);
+      lctx.setTransform(labDpr, 0, 0, labDpr, 0, 0);
+    }
+
+    function spawnCell(x, y, energy) {
+      cells.push({
+        x: x,
+        y: y,
+        vx: (Math.random() - 0.5) * 0.8,
+        vy: (Math.random() - 0.5) * 0.8,
+        energy: energy,
+        wander: Math.random() * Math.PI * 2,
+        tint: Math.random()
+      });
+    }
+
+    function spawnFood(x, y) {
+      foods.push({
+        x: x,
+        y: y,
+        born: performance.now(),
+        phase: Math.random() * Math.PI * 2
+      });
+    }
+
+    function seedLab() {
+      cells = [];
+      foods = [];
+      labBirths = 0;
+      for (var i = 0; i < SEED_CELLS; i++) {
+        spawnCell(Math.random() * labW, Math.random() * labH, 55 + Math.random() * 35);
+      }
+      for (var j = 0; j < SEED_FOOD; j++) {
+        spawnFood(20 + Math.random() * (labW - 40), 20 + Math.random() * (labH - 40));
+      }
+      updateLabStats(true);
+    }
+
+    function updateLabStats(force) {
+      var now = performance.now();
+      if (!force && now - lastStatsUpdate < 400) return;
+      lastStatsUpdate = now;
+      if (labPopEl) labPopEl.textContent = String(cells.length);
+      if (labBirthsEl) labBirthsEl.textContent = String(labBirths);
+      if (labFoodEl) labFoodEl.textContent = String(foods.length);
+    }
+
+    function updateCell(cell) {
+      // Seek the nearest food within sensing range
+      var targetX = 0;
+      var targetY = 0;
+      var bestDist = SENSE_RADIUS;
+      var found = false;
+      for (var i = 0; i < foods.length; i++) {
+        var f = foods[i];
+        var dx = f.x - cell.x;
+        var dy = f.y - cell.y;
+        var dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < bestDist) {
+          bestDist = dist;
+          targetX = dx;
+          targetY = dy;
+          found = true;
+        }
+      }
+      if (found) {
+        var norm = bestDist || 1;
+        cell.vx += (targetX / norm) * 0.06;
+        cell.vy += (targetY / norm) * 0.06;
+      } else {
+        // Gentle wandering when nothing is in sight
+        cell.wander += (Math.random() - 0.5) * 0.5;
+        cell.vx += Math.cos(cell.wander) * 0.03;
+        cell.vy += Math.sin(cell.wander) * 0.03;
+      }
+
+      // Curiosity: cells drift toward the visitor's pointer
+      var pdx = labPointer.x - cell.x;
+      var pdy = labPointer.y - cell.y;
+      var pdist = Math.sqrt(pdx * pdx + pdy * pdy);
+      if (pdist < POINTER_RADIUS && pdist > 14) {
+        cell.vx += (pdx / pdist) * 0.045;
+        cell.vy += (pdy / pdist) * 0.045;
+      }
+
+      // Speed limit + drag
+      var speed = Math.sqrt(cell.vx * cell.vx + cell.vy * cell.vy);
+      var maxSpeed = 1.5;
+      if (speed > maxSpeed) {
+        cell.vx = (cell.vx / speed) * maxSpeed;
+        cell.vy = (cell.vy / speed) * maxSpeed;
+      }
+      cell.vx *= 0.985;
+      cell.vy *= 0.985;
+      cell.x += cell.vx;
+      cell.y += cell.vy;
+
+      // Soft walls
+      if (cell.x < 10) cell.vx += 0.08;
+      if (cell.x > labW - 10) cell.vx -= 0.08;
+      if (cell.y < 10) cell.vy += 0.08;
+      if (cell.y > labH - 10) cell.vy -= 0.08;
+
+      cell.energy -= ENERGY_DRAIN + speed * 0.012;
+    }
+
+    function cellRadius(cell) {
+      return Math.max(2.4, Math.min(7, 2.4 + cell.energy * 0.04));
+    }
+
+    function drawLabFrame(now) {
+      lctx.clearRect(0, 0, labW, labH);
+
+      // Food: small pulsing seeds
+      for (var i = 0; i < foods.length; i++) {
+        var f = foods[i];
+        var pulse = 1 + Math.sin(now / 420 + f.phase) * 0.25;
+        lctx.fillStyle = "rgba(" + fxColors.b + ",.8)";
+        lctx.beginPath();
+        lctx.arc(f.x, f.y, 2.2 * pulse, 0, Math.PI * 2);
+        lctx.fill();
+        lctx.fillStyle = "rgba(" + fxColors.b + ",.18)";
+        lctx.beginPath();
+        lctx.arc(f.x, f.y, 6 * pulse, 0, Math.PI * 2);
+        lctx.fill();
+      }
+
+      // Cells: glowing organisms, size tied to energy
+      for (var j = 0; j < cells.length; j++) {
+        var c = cells[j];
+        var r = cellRadius(c);
+        var color = c.tint < 0.5 ? fxColors.a : fxColors.b;
+        var alpha = Math.max(0.35, Math.min(1, c.energy / 80));
+        lctx.fillStyle = "rgba(" + color + "," + (alpha * 0.22).toFixed(3) + ")";
+        lctx.beginPath();
+        lctx.arc(c.x, c.y, r * 2.2, 0, Math.PI * 2);
+        lctx.fill();
+        lctx.fillStyle = "rgba(" + color + "," + alpha.toFixed(3) + ")";
+        lctx.beginPath();
+        lctx.arc(c.x, c.y, r, 0, Math.PI * 2);
+        lctx.fill();
+        lctx.fillStyle = "rgba(255,255,255," + (alpha * 0.5).toFixed(3) + ")";
+        lctx.beginPath();
+        lctx.arc(c.x - r * 0.3, c.y - r * 0.3, r * 0.3, 0, Math.PI * 2);
+        lctx.fill();
+      }
+    }
+
+    function labTick(now) {
+      // Regular food drops keep the ecosystem alive
+      if (now - lastFoodSpawn > FOOD_SPAWN_EVERY && foods.length < MAX_FOOD) {
+        spawnFood(20 + Math.random() * (labW - 40), 20 + Math.random() * (labH - 40));
+        lastFoodSpawn = now;
+      }
+
+      for (var i = cells.length - 1; i >= 0; i--) {
+        var cell = cells[i];
+        updateCell(cell);
+
+        // Eat food on contact
+        var r = cellRadius(cell);
+        for (var j = foods.length - 1; j >= 0; j--) {
+          var f = foods[j];
+          var dx = f.x - cell.x;
+          var dy = f.y - cell.y;
+          if (dx * dx + dy * dy < (r + 4) * (r + 4)) {
+            cell.energy += FOOD_ENERGY;
+            foods.splice(j, 1);
+          }
+        }
+
+        // Division when well fed
+        if (cell.energy >= SPLIT_ENERGY && cells.length < MAX_CELLS) {
+          cell.energy /= 2;
+          spawnCell(cell.x + (Math.random() - 0.5) * 8, cell.y + (Math.random() - 0.5) * 8, cell.energy);
+          labBirths += 1;
+        }
+
+        // Starvation
+        if (cell.energy <= 0) {
+          cells.splice(i, 1);
+        }
+      }
+
+      // Never let the dish go completely empty
+      if (cells.length === 0) {
+        for (var k = 0; k < 3; k++) {
+          spawnCell(Math.random() * labW, Math.random() * labH, 60);
+        }
+      }
+
+      drawLabFrame(now);
+      updateLabStats(false);
+      labRaf = requestAnimationFrame(labTick);
+    }
+
+    function startLab() {
+      if (labRunning || prefersReducedMotion) return;
+      labRunning = true;
+      lastFoodSpawn = performance.now();
+      labRaf = requestAnimationFrame(labTick);
+    }
+
+    function stopLab() {
+      labRunning = false;
+      cancelAnimationFrame(labRaf);
+    }
+
+    labCanvas.addEventListener("pointermove", function (e) {
+      var rect = labCanvas.getBoundingClientRect();
+      labPointer.x = e.clientX - rect.left;
+      labPointer.y = e.clientY - rect.top;
+    });
+
+    labCanvas.addEventListener("pointerleave", function () {
+      labPointer.x = -999;
+      labPointer.y = -999;
+    });
+
+    labCanvas.addEventListener("pointerdown", function (e) {
+      var rect = labCanvas.getBoundingClientRect();
+      var x = e.clientX - rect.left;
+      var y = e.clientY - rect.top;
+      for (var i = 0; i < 4; i++) {
+        if (foods.length >= MAX_FOOD + FOOD_CLICK_BUFFER) break;
+        spawnFood(
+          Math.max(8, Math.min(labW - 8, x + (Math.random() - 0.5) * 36)),
+          Math.max(8, Math.min(labH - 8, y + (Math.random() - 0.5) * 36))
+        );
+      }
+      updateLabStats(true);
+      trackInteraction();
+      if (prefersReducedMotion) drawLabFrame(performance.now());
+    });
+
+    if (labResetBtn) {
+      labResetBtn.addEventListener("click", function () {
+        seedLab();
+        trackInteraction();
+        if (prefersReducedMotion) drawLabFrame(performance.now());
+      });
+    }
+
+    var labResizeTimer;
+    window.addEventListener("resize", function () {
+      clearTimeout(labResizeTimer);
+      labResizeTimer = setTimeout(function () {
+        sizeLabCanvas();
+        if (prefersReducedMotion) drawLabFrame(performance.now());
+      }, 200);
+    });
+
+    sizeLabCanvas();
+    seedLab();
+
+    if (prefersReducedMotion) {
+      // Static snapshot for reduced motion: render once, no animation loop
+      drawLabFrame(performance.now());
+    } else if ("IntersectionObserver" in window) {
+      var labObserver = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) startLab();
+          else stopLab();
+        });
+      }, { threshold: 0 });
+      labObserver.observe(labCanvas);
+    } else {
+      startLab();
     }
   }
 
