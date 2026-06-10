@@ -43,17 +43,39 @@
     <section class="hero">
       <canvas class="hero-canvas" aria-hidden="true"></canvas>
       <div class="wrap hero-inner">
-        <span class="eyebrow">UI/UX · Jeu vidéo · Simulation</span>
-        <h1>Je conçois <span class="type-wrap"><span id="typewriter">des interfaces et des mondes</span><span class="type-caret" aria-hidden="true"></span></span> qui <span class="grad">prennent vie</span>.</h1>
-        <p>
-          Je passe mon temps libre à imaginer des outils soignés et des systèmes vivants.
-          Chaque projet est une occasion d'explorer une idée, de peaufiner une interface
-          et d'observer un comportement émerger à l'écran.
-        </p>
-        <div class="hero-actions">
-          <a class="btn btn-primary" href="#projets">Découvrir les projets</a>
-          <a class="btn btn-ghost" href="https://github.com/Nilujien" target="_blank" rel="noopener">Mon GitHub</a>
+        <div class="hero-copy">
+          <span class="eyebrow">UI/UX · Jeu vidéo · Simulation</span>
+          <h1>
+            Je conçois
+            <span class="type-wrap"><span class="type-sizer" aria-hidden="true">des interfaces et des mondes</span><span class="type-live"><span id="typewriter">des interfaces et des mondes</span><span class="type-caret" aria-hidden="true"></span></span></span>
+            <span class="type-tail">qui <span class="grad">prennent vie</span>.</span>
+          </h1>
+          <p>
+            Je passe mon temps libre à imaginer des outils soignés et des systèmes vivants.
+            Chaque projet est une occasion d'explorer une idée, de peaufiner une interface
+            et d'observer un comportement émerger à l'écran — comme dans l'écosystème ci-contre.
+          </p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#projets">Découvrir les projets</a>
+            <a class="btn btn-ghost" href="https://github.com/Nilujien" target="_blank" rel="noopener">Mon GitHub</a>
+          </div>
         </div>
+        <figure class="hero-lab reveal">
+          <figcaption class="hero-lab-head">
+            <span class="hero-lab-dot" aria-hidden="true"></span>
+            <span class="hero-lab-title">Petite simulation vivante</span>
+            <button class="hero-lab-reset" id="lab-reset" type="button" title="Réensemencer l'écosystème">Réensemencer</button>
+          </figcaption>
+          <div class="hero-lab-stage">
+            <canvas id="lab-canvas" aria-label="Écosystème simulé : des cellules cherchent de la nourriture, se reproduisent et disparaissent. Cliquez pour déposer de la nourriture."></canvas>
+          </div>
+          <div class="hero-lab-stats" aria-hidden="true">
+            <span>Population <strong id="lab-pop">0</strong></span>
+            <span>Naissances <strong id="lab-births">0</strong></span>
+            <span>Nourriture <strong id="lab-food">0</strong></span>
+          </div>
+          <p class="hero-lab-hint">Cliquez pour nourrir · survolez pour attirer les cellules</p>
+        </figure>
         <div class="principles reveal">
           <article>
             <span>01</span>
@@ -71,17 +93,6 @@
             <p>Micro-interactions discrètes pour enrichir l'expérience.</p>
           </article>
         </div>
-        <figure class="hero-lab reveal">
-          <figcaption class="hero-lab-head">
-            <span class="hero-lab-dot" aria-hidden="true"></span>
-            Petite simulation vivante
-          </figcaption>
-          <div class="hero-lab-stage" aria-hidden="true">
-            <div class="hero-orb orb-main"></div>
-            <div class="hero-orb orb-soft"></div>
-            <div class="hero-orb orb-spark"></div>
-          </div>
-        </figure>
       </div>
     </section>
 
@@ -151,7 +162,7 @@
         <div class="section-head reveal">
           <span class="label">Méthode UI/UX</span>
           <h2>Du problème au prototype itéré</h2>
-          <p>Un parcours interactif qui montre comment chaque interface progresse avec des retours réels.</p>
+          <p>La démarche que j'applique à mes projets personnels : observer, explorer, prototyper, puis ajuster.</p>
         </div>
         <div class="process-grid reveal">
           <div class="process-steps" role="tablist" aria-label="Étapes de conception UI UX">
@@ -175,7 +186,7 @@
             </div>
             <ul>
               <li>Décision UI : renforcer le contraste des actions clés.</li>
-              <li>Feedback : lecture plus rapide sur mobile.</li>
+              <li>Constat : la lecture devient plus rapide, surtout sur mobile.</li>
             </ul>
           </article>
         </div>
